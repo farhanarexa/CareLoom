@@ -26,11 +26,11 @@ function Navbar() {
         </div>
 
         <div className="hidden md:flex space-x-8">
-          <a href="#" className="text-[#374151] hover:text-[#2BAE9E] font-medium">Home</a>
-          <a href="#" className="text-[#374151] hover:text-[#2BAE9E] font-medium">Services</a>
-          <a href="#" className="text-[#374151] hover:text-[#2BAE9E] font-medium">How It Works</a>
-          <a href="#" className="text-[#374151] hover:text-[#2BAE9E] font-medium">Find Caregiver</a>
-          <a href="#" className="text-[#374151] hover:text-[#2BAE9E] font-medium">Become a Caregiver</a>
+          <a href="/" className="text-[#374151] hover:text-[#2BAE9E] font-medium">Home</a>
+          <a href="/services" className="text-[#374151] hover:text-[#2BAE9E] font-medium">Services</a>
+          <a href="/how-it-works" className="text-[#374151] hover:text-[#2BAE9E] font-medium">How It Works</a>
+          <a href="/find-caregiver" className="text-[#374151] hover:text-[#2BAE9E] font-medium">Find Caregiver</a>
+          <a href="/become-caregiver" className="text-[#374151] hover:text-[#2BAE9E] font-medium">Become a Caregiver</a>
         </div>
 
         <div className="flex items-center space-x-4">
@@ -96,11 +96,11 @@ function Footer() {
           <div>
             <h3 className="text-lg font-semibold mb-4">Company</h3>
             <ul className="space-y-2">
-              <li><a href="#" className="text-gray-300 hover:text-white">About Us</a></li>
-              <li><a href="#" className="text-gray-300 hover:text-white">How It Works</a></li>
+              <li><a href="/about" className="text-gray-300 hover:text-white">About Us</a></li>
+              <li><a href="/how-it-works" className="text-gray-300 hover:text-white">How It Works</a></li>
               <li><a href="#" className="text-gray-300 hover:text-white">Careers</a></li>
               <li><a href="#" className="text-gray-300 hover:text-white">Blog</a></li>
-              <li><a href="#" className="text-gray-300 hover:text-white">Contact Us</a></li>
+              <li><a href="/contact" className="text-gray-300 hover:text-white">Contact Us</a></li>
             </ul>
           </div>
 
