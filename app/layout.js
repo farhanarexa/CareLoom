@@ -1,5 +1,6 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { AuthProvider } from '../components/PrivateRoute';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -34,10 +35,10 @@ function Navbar() {
         </div>
 
         <div className="flex items-center space-x-4">
-          <button className="hidden md:block text-[#2BAE9E] font-medium hover:text-[#5a9e7f]">Sign In</button>
-          <button className="bg-[#2BAE9E] text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-[#5a9e7f] transition duration-300">
+          <a href="/auth/login" className="hidden md:block text-[#2BAE9E] font-medium hover:text-[#5a9e7f]">Sign In</a>
+          <a href="/auth/register" className="bg-[#2BAE9E] text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-[#5a9e7f] transition duration-300">
             Sign Up
-          </button>
+          </a>
           <button className="md:hidden text-[#374151]">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
@@ -144,11 +145,13 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col min-h-screen`}>
-        <Navbar />
-        <main className="flex-grow">
-          {children}
-        </main>
-        <Footer />
+        <AuthProvider>
+          <Navbar />
+          <main className="flex-grow">
+            {children}
+          </main>
+          <Footer />
+        </AuthProvider>
       </body>
     </html>
   );
