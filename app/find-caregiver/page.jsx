@@ -1,8 +1,10 @@
-import Image from "next/image";
+'use client';
+
+import { useState, useMemo } from 'react';
 
 export default function FindCaregiverPage() {
   // Mock data for caregivers
-  const caregivers = [
+  const [caregivers] = useState([
     {
       id: 1,
       name: "Sarah Johnson",
@@ -14,7 +16,8 @@ export default function FindCaregiverPage() {
       image: "/placeholder-caregiver.jpg",
       location: "Dhaka, Bangladesh",
       bio: "Passionate caregiver with extensive experience in child development and early education.",
-      availability: "Available this week"
+      availability: "Available this week",
+      services: ["Baby Care"]
     },
     {
       id: 2,
@@ -27,7 +30,8 @@ export default function FindCaregiverPage() {
       image: "/placeholder-caregiver.jpg",
       location: "Dhaka, Bangladesh",
       bio: "Compassionate elderly care specialist with nursing background and extensive experience.",
-      availability: "Available next week"
+      availability: "Available next week",
+      services: ["Elderly Care"]
     },
     {
       id: 3,
@@ -40,7 +44,8 @@ export default function FindCaregiverPage() {
       image: "/placeholder-caregiver.jpg",
       location: "Dhaka, Bangladesh",
       bio: "Experienced nanny with expertise in infant care and early childhood development.",
-      availability: "Available today"
+      availability: "Available today",
+      services: ["Baby Care"]
     },
     {
       id: 4,
@@ -53,7 +58,8 @@ export default function FindCaregiverPage() {
       image: "/placeholder-caregiver.jpg",
       location: "Dhaka, Bangladesh",
       bio: "Specialized in caring for individuals with special needs and chronic conditions.",
-      availability: "Available this week"
+      availability: "Available this week",
+      services: ["Special Needs"]
     },
     {
       id: 5,
@@ -66,7 +72,8 @@ export default function FindCaregiverPage() {
       image: "/placeholder-caregiver.jpg",
       location: "Dhaka, Bangladesh",
       bio: "Dedicated caregiver with medical training and experience in post-surgery care.",
-      availability: "Available tomorrow"
+      availability: "Available tomorrow",
+      services: ["Sick Care"]
     },
     {
       id: 6,
@@ -79,9 +86,101 @@ export default function FindCaregiverPage() {
       image: "/placeholder-caregiver.jpg",
       location: "Dhaka, Bangladesh",
       bio: "Multi-skilled caregiver who provides comprehensive household support and pet care.",
-      availability: "Available this week"
+      availability: "Available this week",
+      services: ["Pet Care"]
     }
-  ];
+  ]);
+
+  // State for filter values
+  const [serviceType, setServiceType] = useState('All Services');
+  const [location, setLocation] = useState('');
+  const [experience, setExperience] = useState('Any Experience');
+  const [hourlyRate, setHourlyRate] = useState('Any Rate');
+  const [sortBy, setSortBy] = useState('Top Rated');
+
+  // Function to extract years from experience string
+  const getExperienceYears = (experienceStr) => {
+    const match = experienceStr.match(/(\d+)/);
+    return match ? parseInt(match[0]) : 0;
+  };
+
+  // Function to get min rate from rate range string
+  const getMinRate = (rateStr) => {
+    const match = rateStr.match(/\$(\d+)/g);
+    if (match) {
+      return parseInt(match[0].replace('$', ''));
+    }
+    return 0;
+  };
+
+  // Function to get max rate from rate range string
+  const getMaxRate = (rateStr) => {
+    const match = rateStr.match(/\$(\d+)/g);
+    if (match && match.length > 1) {
+      return parseInt(match[1].replace('$', ''));
+    }
+    return Infinity;
+  };
+
+  // Filter caregivers based on selected filters
+  const filteredCaregivers = useMemo(() => {
+    let result = [...caregivers];
+
+    // Filter by service type
+    if (serviceType !== 'All Services') {
+      result = result.filter(caregiver =>
+        caregiver.services && caregiver.services.includes(serviceType)
+      );
+    }
+
+    // Filter by location (case insensitive partial match)
+    if (location) {
+      result = result.filter(caregiver =>
+        caregiver.location.toLowerCase().includes(location.toLowerCase())
+      );
+    }
+
+    // Filter by experience
+    if (experience !== 'Any Experience') {
+      const minExp = getExperienceYears(experience);
+      result = result.filter(caregiver => {
+        const caregiverExp = getExperienceYears(caregiver.experience);
+        return caregiverExp >= minExp;
+      });
+    }
+
+    // Filter by hourly rate
+    if (hourlyRate !== 'Any Rate') {
+      result = result.filter(caregiver => {
+        const minRate = getMinRate(hourlyRate);
+        const maxRate = getMaxRate(hourlyRate);
+        return caregiver.hourlyRate >= minRate && caregiver.hourlyRate <= maxRate;
+      });
+    }
+
+    // Sort caregivers
+    switch (sortBy) {
+      case 'Top Rated':
+        result.sort((a, b) => b.rating - a.rating);
+        break;
+      case 'Most Reviewed':
+        result.sort((a, b) => b.reviews - a.reviews);
+        break;
+      case 'Lowest Rate':
+        result.sort((a, b) => a.hourlyRate - b.hourlyRate);
+        break;
+      default:
+        break;
+    }
+
+    return result;
+  }, [caregivers, serviceType, location, experience, hourlyRate, sortBy]);
+
+  // Handle search button click
+  const handleSearch = () => {
+    // The search is already handled by the filtering logic
+    // This function can be expanded if needed
+  };
 
   return (
     <div className="min-h-screen bg-[#FFF8F0] py-12">
@@ -99,7 +198,11 @@ export default function FindCaregiverPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Service Type</label>
-              <select className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2BAE9E] focus:border-transparent">
+              <select
+                value={serviceType}
+                onChange={(e) => setServiceType(e.target.value)}
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2BAE9E] focus:border-transparent"
+              >
                 <option>All Services</option>
                 <option>Baby Care</option>
                 <option>Elderly Care</option>
@@ -110,15 +213,21 @@ export default function FindCaregiverPage() {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
-              <input 
-                type="text" 
-                placeholder="Enter location" 
+              <input
+                type="text"
+                placeholder="Enter location"
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
                 className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2BAE9E] focus:border-transparent"
               />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Experience</label>
-              <select className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2BAE9E] focus:border-transparent">
+              <select
+                value={experience}
+                onChange={(e) => setExperience(e.target.value)}
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2BAE9E] focus:border-transparent"
+              >
                 <option>Any Experience</option>
                 <option>1+ Years</option>
                 <option>3+ Years</option>
@@ -128,7 +237,11 @@ export default function FindCaregiverPage() {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Hourly Rate</label>
-              <select className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2BAE9E] focus:border-transparent">
+              <select
+                value={hourlyRate}
+                onChange={(e) => setHourlyRate(e.target.value)}
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2BAE9E] focus:border-transparent"
+              >
                 <option>Any Rate</option>
                 <option>$15 - $20</option>
                 <option>$20 - $25</option>
@@ -137,7 +250,10 @@ export default function FindCaregiverPage() {
               </select>
             </div>
             <div className="flex items-end">
-              <button className="w-full bg-[#2BAE9E] text-white py-3 px-4 rounded-lg font-medium hover:bg-[#5a9e7f] transition duration-300">
+              <button
+                onClick={handleSearch}
+                className="w-full bg-[#2BAE9E] text-white py-3 px-4 rounded-lg font-medium hover:bg-[#5a9e7f] transition duration-300"
+              >
                 Search Caregivers
               </button>
             </div>
@@ -147,14 +263,17 @@ export default function FindCaregiverPage() {
         {/* Results Summary */}
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold text-[#374151]">
-            {caregivers.length} Caregivers Found
+            {filteredCaregivers.length} Caregivers Found
           </h2>
           <div className="flex items-center space-x-4">
             <span className="text-gray-700">Sort by:</span>
-            <select className="p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2BAE9E] focus:border-transparent">
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              className="p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2BAE9E] focus:border-transparent"
+            >
               <option>Top Rated</option>
               <option>Most Reviewed</option>
-              <option>Closest</option>
               <option>Lowest Rate</option>
             </select>
           </div>
@@ -162,53 +281,60 @@ export default function FindCaregiverPage() {
 
         {/* Caregiver Cards */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-          {caregivers.map((caregiver) => (
-            <div key={caregiver.id} className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
-              <div className="p-6">
-                <div className="flex items-start">
-                  <div className="bg-gray-200 border-2 border-dashed rounded-xl w-16 h-16 mr-4 flex-shrink-0" />
-                  <div className="flex-grow">
-                    <div className="flex justify-between items-start">
-                      <h3 className="text-xl font-bold text-[#374151]">{caregiver.name}</h3>
-                      <div className="flex items-center bg-[#F7EFE5] px-2 py-1 rounded">
-                        <svg className="w-4 h-4 text-yellow-400 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                        </svg>
-                        <span className="font-bold text-[#374151]">{caregiver.rating}</span>
+          {filteredCaregivers.length > 0 ? (
+            filteredCaregivers.map((caregiver) => (
+              <div key={caregiver.id} className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
+                <div className="p-6">
+                  <div className="flex items-start">
+                    <div className="bg-gray-200 border-2 border-dashed rounded-xl w-16 h-16 mr-4 flex-shrink-0" />
+                    <div className="flex-grow">
+                      <div className="flex justify-between items-start">
+                        <h3 className="text-xl font-bold text-[#374151]">{caregiver.name}</h3>
+                        <div className="flex items-center bg-[#F7EFE5] px-2 py-1 rounded">
+                          <svg className="w-4 h-4 text-yellow-400 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                          </svg>
+                          <span className="font-bold text-[#374151]">{caregiver.rating}</span>
+                        </div>
                       </div>
-                    </div>
-                    <p className="text-gray-600 text-sm mb-2">{caregiver.location}</p>
-                    <p className="text-gray-500 text-sm mb-3">{caregiver.experience} experience</p>
-                    <div className="flex flex-wrap gap-2 mb-4">
-                      {caregiver.skills.map((skill, index) => (
-                        <span key={index} className="bg-[#EADBC8] text-[#374151] text-xs px-2 py-1 rounded">
-                          {skill}
-                        </span>
-                      ))}
-                    </div>
-                    <p className="text-gray-700 mb-4">{caregiver.bio}</p>
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <span className="text-lg font-bold text-[#2BAE9E]">${caregiver.hourlyRate}</span>
-                        <span className="text-gray-600 text-sm">/hr</span>
+                      <p className="text-gray-600 text-sm mb-2">{caregiver.location}</p>
+                      <p className="text-gray-500 text-sm mb-3">{caregiver.experience} experience</p>
+                      <div className="flex flex-wrap gap-2 mb-4">
+                        {caregiver.skills.map((skill, index) => (
+                          <span key={index} className="bg-[#EADBC8] text-[#374151] text-xs px-2 py-1 rounded">
+                            {skill}
+                          </span>
+                        ))}
                       </div>
-                      <div className="text-sm text-gray-600">{caregiver.availability}</div>
+                      <p className="text-gray-700 mb-4">{caregiver.bio}</p>
+                      <div className="flex justify-between items-center">
+                        <div>
+                          <span className="text-lg font-bold text-[#2BAE9E]">${caregiver.hourlyRate}</span>
+                          <span className="text-gray-600 text-sm">/hr</span>
+                        </div>
+                        <div className="text-sm text-gray-600">{caregiver.availability}</div>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-              <div className="bg-[#F7EFE5] px-6 py-4">
-                <div className="flex justify-between">
-                  <button className="text-[#2BAE9E] font-medium hover:text-[#5a9e7f]">
-                    View Profile
-                  </button>
-                  <button className="bg-[#2BAE9E] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#5a9e7f] transition duration-300">
-                    Contact
-                  </button>
+                <div className="bg-[#F7EFE5] px-6 py-4">
+                  <div className="flex justify-between">
+                    <button className="text-[#2BAE9E] font-medium hover:text-[#5a9e7f]">
+                      View Profile
+                    </button>
+                    <button className="bg-[#2BAE9E] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#5a9e7f] transition duration-300">
+                      Contact
+                    </button>
+                  </div>
                 </div>
               </div>
+            ))
+          ) : (
+            <div className="col-span-full text-center py-12">
+              <h3 className="text-xl font-bold text-[#374151] mb-2">No caregivers found</h3>
+              <p className="text-gray-600">Try adjusting your filters to find more results.</p>
             </div>
-          ))}
+          )}
         </div>
 
         {/* Pagination */}
