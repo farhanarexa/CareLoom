@@ -54,11 +54,11 @@ function Navbar() {
 // Footer Component
 function Footer() {
   return (
-    <footer className="bg-[#374151] text-white pt-16 pb-8 px-4">
+    <footer className="bg-secondary text-white pt-16 pb-8 px-4">
       <div className="container mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
           <div>
-            <h3 className="text-xl font-bold text-[#2BAE9E] mb-4">CareLoom</h3>
+            <h3 className="text-5xl font-bold mb-4">CareLoom</h3>
             <p className="text-gray-300 mb-4">
               Connecting families with trusted, professional caregivers for children, elderly, and special care needs.
             </p>
