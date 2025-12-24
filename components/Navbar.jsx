@@ -2,9 +2,13 @@
 
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
+import { useState } from 'react';
+import { useSession, signOut } from 'next-auth/react';
 
 export default function Navbar() {
   const pathname = usePathname();
+  const { data: session, status } = useSession();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   // Function to determine if a link is active
   const isActive = (path) => {
@@ -12,6 +16,11 @@ export default function Navbar() {
       return pathname === path;
     }
     return pathname.startsWith(path);
+  };
+
+  const handleLogout = () => {
+    signOut({ callbackUrl: '/' });
+    setIsMenuOpen(false);
   };
 
   return (
@@ -57,19 +66,80 @@ export default function Navbar() {
         </div>
 
         <div className="flex items-center space-x-4">
-          <Link
-            href="/auth/login"
-            className={`hidden md:block ${isActive('/auth/login') ? 'text-[#2BAE9E] font-bold' : 'text-[#2BAE9E] font-medium hover:text-[#5a9e7f]'}`}
+          {status === 'authenticated' && session?.user ? (
+            // Show user profile when logged in
+            <div className="flex items-center space-x-4">
+              <Link href="/my-bookings" className="hidden md:block text-[#2BAE9E] font-medium hover:text-[#5a9e7f]">
+                My Bookings
+              </Link>
+              <div className="relative">
+                <button
+                  className="flex items-center space-x-2 focus:outline-none"
+                  onClick={() => setIsMenuOpen(!isMenuOpen)}
+                >
+                  <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
+                    {session.user.image ? (
+                      <img
+                        src={session.user.image}
+                        alt={session.user.name || 'User'}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <span className="text-[#2BAE9E] font-bold">
+                        {session.user.name ? session.user.name.charAt(0).toUpperCase() : 'U'}
+                      </span>
+                    )}
+                  </div>
+                </button>
+
+                {/* Dropdown menu */}
+                {isMenuOpen && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-200">
+                    <Link
+                      href="/my-bookings"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      My Bookings
+                    </Link>
+                    <Link
+                      href="/profile"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      Profile
+                    </Link>
+                    <button
+                      onClick={handleLogout}
+                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    >
+                      Sign out
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          ) : (
+            // Show login/signup buttons when not logged in
+            <>
+              <Link
+                href="/auth/login"
+                className={`hidden md:block text-[#2BAE9E] font-medium hover:text-[#5a9e7f]`}
+              >
+                Sign In
+              </Link>
+              <Link
+                href="/auth/register"
+                className="bg-[#2BAE9E] text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-[#5a9e7f] transition duration-300"
+              >
+                Sign Up
+              </Link>
+            </>
+          )}
+          <button
+            className="md:hidden text-[#374151]"
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
-            Sign In
-          </Link>
-          <Link
-            href="/auth/register"
-            className={`bg-[#2BAE9E] text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-[#5a9e7f] transition duration-300 ${isActive('/auth/register') ? 'ring-2 ring-[#2BAE9E]/50' : ''}`}
-          >
-            Sign Up
-          </Link>
-          <button className="md:hidden text-[#374151]">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
             </svg>

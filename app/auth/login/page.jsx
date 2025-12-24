@@ -1,8 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import { signIn } from 'next-auth/react';
 
 export default function LoginPage() {
   const [formData, setFormData] = useState({
@@ -10,7 +11,10 @@ export default function LoginPage() {
     password: ''
   });
   const [error, setError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get('callbackUrl') || '/';
 
   const handleChange = (e) => {
     setFormData({
@@ -22,26 +26,44 @@ export default function LoginPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     // Simple validation
     if (!formData.email || !formData.password) {
       setError('Please fill in all fields');
       return;
     }
 
-    // Simulate login process
+    setIsSubmitting(true);
+    setError('');
+
     try {
-      // In a real app, this would be an API call to authenticate the user
-      console.log('Login attempt with:', formData);
-      
-      // Simulate successful login
-      setTimeout(() => {
-        // In a real app, you would set user session/token here
-        // For now, we'll just redirect to the home page
-        router.push('/');
-      }, 1000);
+      // Attempt to sign in with credentials
+      const res = await signIn('credentials', {
+        email: formData.email,
+        password: formData.password,
+        redirect: false,
+        callbackUrl
+      });
+
+      if (res?.error) {
+        setError('Invalid email or password. Please try again.');
+      } else {
+        // Successful login - redirect to callback URL or home
+        router.push(callbackUrl);
+        router.refresh(); // Refresh to update the UI
+      }
     } catch (err) {
-      setError('Invalid email or password. Please try again.');
+      setError('An error occurred during login. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    try {
+      await signIn('google', { callbackUrl });
+    } catch (err) {
+      setError('An error occurred during Google login. Please try again.');
     }
   };
 
@@ -119,9 +141,14 @@ export default function LoginPage() {
             <div>
               <button
                 type="submit"
-                className="w-full bg-[#2BAE9E] text-white py-3 rounded-lg font-medium hover:bg-[#5a9e7f] transition duration-300"
+                disabled={isSubmitting}
+                className={`w-full ${
+                  isSubmitting
+                    ? 'bg-gray-400 text-gray-200'
+                    : 'bg-[#2BAE9E] text-white hover:bg-[#5a9e7f]'
+                } py-3 rounded-lg font-medium transition duration-300`}
               >
-                Sign in
+                {isSubmitting ? 'Signing in...' : 'Sign in'}
               </button>
             </div>
           </form>
@@ -136,9 +163,10 @@ export default function LoginPage() {
               </div>
             </div>
 
-            <div className="mt-6 ">
+            <div className="mt-6">
               <button
                 type="button"
+                onClick={handleGoogleSignIn}
                 className="w-full inline-flex justify-center py-3 px-4 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50"
               >
                 <svg className="w-5 h-5" viewBox="0 0 24 24">
@@ -149,8 +177,6 @@ export default function LoginPage() {
                 </svg>
                 <span className="ml-2">Google</span>
               </button>
-
-              
             </div>
           </div>
 

@@ -51,7 +51,7 @@ const mockBookings = [
   }
 ];
 
-export default function MyBookingsPage() {
+function MyBookingsPage() {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all'); // all, pending, confirmed, completed, cancelled
@@ -71,9 +71,9 @@ export default function MyBookingsPage() {
 
   const handleCancelBooking = (bookingId) => {
     if (window.confirm('Are you sure you want to cancel this booking?')) {
-      setBookings(bookings.map(booking => 
-        booking.id === bookingId 
-          ? { ...booking, status: 'Cancelled' } 
+      setBookings(bookings.map(booking =>
+        booking.id === bookingId
+          ? { ...booking, status: 'Cancelled' }
           : booking
       ));
     }
@@ -140,8 +140,8 @@ export default function MyBookingsPage() {
           <div className="bg-white rounded-2xl shadow-lg p-12 text-center">
             <h2 className="text-2xl font-bold text-[#374151] mb-4">No bookings found</h2>
             <p className="text-gray-600 mb-6">You don't have any bookings yet.</p>
-            <a 
-              href="/services" 
+            <a
+              href="/services"
               className="inline-block bg-[#2BAE9E] text-white px-6 py-3 rounded-full font-medium hover:bg-[#5a9e7f] transition duration-300"
             >
               Browse Services
@@ -159,7 +159,7 @@ export default function MyBookingsPage() {
                         {booking.status}
                       </span>
                     </div>
-                    
+
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                       <div>
                         <p className="text-gray-600">Duration: <span className="text-gray-800 font-medium">{booking.duration}</span></p>
@@ -170,10 +170,10 @@ export default function MyBookingsPage() {
                         <p className="text-gray-600">Date: <span className="text-gray-800 font-medium">{booking.date}</span></p>
                       </div>
                     </div>
-                    
+
                     <p className="text-lg font-bold text-[#2BAE9E]">Total Cost: ${booking.totalCost}</p>
                   </div>
-                  
+
                   <div className="md:w-1/3 md:text-right mt-4 md:mt-0 flex flex-col items-end justify-between">
                     {booking.status === 'Pending' && (
                       <button
@@ -183,13 +183,13 @@ export default function MyBookingsPage() {
                         Cancel Booking
                       </button>
                     )}
-                    
+
                     {booking.status === 'Completed' && booking.rating === 0 && (
                       <button className="px-4 py-2 bg-[#2BAE9E] text-white rounded-lg hover:bg-[#5a9e7f] transition duration-300">
                         Rate Service
                       </button>
                     )}
-                    
+
                     <button className="px-4 py-2 border border-[#2BAE9E] text-[#2BAE9E] rounded-lg hover:bg-[#F7EFE5] transition duration-300">
                       View Details
                     </button>
@@ -205,12 +205,10 @@ export default function MyBookingsPage() {
 }
 
 // Wrapper component to use PrivateRoute
-function MyBookingsPageWrapper() {
+export default function MyBookingsPageWrapper() {
   return (
     <PrivateRoute>
       <MyBookingsPage />
     </PrivateRoute>
   );
 }
-
-export { MyBookingsPageWrapper as default };

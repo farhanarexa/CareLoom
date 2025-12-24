@@ -1,7 +1,10 @@
+'use client';
+
 import { useState, useEffect } from 'react';
 import { notFound } from 'next/navigation';
 import { PrivateRoute } from '../../../components/PrivateRoute';
 import { sendBookingConfirmationEmail, generateBookingInvoiceTemplate } from '../../../lib/emailService';
+import { useSession } from 'next-auth/react';
 
 // Mock data for services
 const services = [
@@ -51,6 +54,7 @@ const services = [
 
 function BookingPageContent({ params }) {
   const service = services.find(s => s.id === params.serviceId);
+  const { data: session, status } = useSession();
 
   if (!service) {
     notFound();
@@ -105,8 +109,8 @@ function BookingPageContent({ params }) {
       serviceId: service.id
     };
 
-    // Get user from localStorage (in a real app, this would be from auth context)
-    const user = JSON.parse(localStorage.getItem('careloom_user') || '{"name": "John Doe", "email": "john@example.com"}');
+    // Get user from NextAuth session
+    const user = session?.user || { name: 'John Doe', email: 'john@example.com' };
 
     try {
       // Simulate booking submission
@@ -127,6 +131,14 @@ function BookingPageContent({ params }) {
       setIsSubmitting(false);
     }
   };
+
+  if (status === 'loading') {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#FFF8F0]">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#2BAE9E]"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#FFF8F0] py-12">

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { signIn } from 'next-auth/react';
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
@@ -94,18 +95,55 @@ export default function RegisterPage() {
     setIsSubmitting(true);
 
     try {
-      // In a real app, this would be an API call to register the user
-      console.log('Registration attempt with:', formData);
+      // Call the registration API endpoint
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          password: formData.password,
+          nid: formData.nid,
+          contact: formData.contact,
+        }),
+      });
 
-      // Simulate successful registration
-      setTimeout(() => {
-        // In a real app, you would set user session/token here
-        // For now, we'll just redirect to the login page
-        router.push('/auth/login');
+      const data = await response.json();
+
+      if (!response.ok) {
+        if (response.status === 409) {
+          setErrors({ submit: 'A user with this email already exists.' });
+        } else {
+          setErrors({ submit: data.error || 'Registration failed. Please try again.' });
+        }
         setIsSubmitting(false);
-      }, 1500);
-    } catch (err) {
-      setErrors({ submit: 'Registration failed. Please try again.' });
+        return;
+      }
+
+      // Registration successful, now try to sign in
+      const signInResult = await signIn('credentials', {
+        email: formData.email,
+        password: formData.password,
+        redirect: false,
+      });
+
+      if (signInResult?.error) {
+        setErrors({ submit: 'Registration successful, but login failed. Please try logging in.' });
+        // Redirect to login page after a delay
+        setTimeout(() => {
+          router.push('/auth/login');
+        }, 2000);
+      } else {
+        // Successful registration and login
+        router.push('/');
+        router.refresh(); // Refresh to update the UI
+      }
+    } catch (error) {
+      console.error('Registration error:', error);
+      setErrors({ submit: 'An unexpected error occurred. Please try again.' });
+    } finally {
       setIsSubmitting(false);
     }
   };
