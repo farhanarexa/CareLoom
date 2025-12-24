@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 
 export const metadata = {
   title: "CareLoom - Trusted Care Services for Children, Elderly & Special Needs",
@@ -32,7 +33,7 @@ export default function Home() {
   return (
     <div className="font-sans">
       {/* Banner/Slider Section */}
-      <section className="relative bg-gradient-to-r from-[#2BAE9E] to-[#5a9e7f] text-white">
+      <section className="relative bg-linear-to-r from-[#2BAE9E] to-[#5a9e7f] text-white">
         <div className="container mx-auto px-4 py-24">
           <div className="flex flex-col items-center text-center">
             <h1 className="text-4xl md:text-6xl font-bold mb-6">
@@ -43,10 +44,10 @@ export default function Home() {
             </p>
             <div className="flex gap-4">
               <button className="bg-white text-[#2BAE9E] font-bold px-8 py-3 rounded-full text-lg hover:bg-[#F7EFE5] transition duration-300">
-                Find a Caregiver
+                <Link href="/find-caregiver">Find Caregiver</Link>
               </button>
               <button className="bg-transparent border-2 border-white text-white font-bold px-8 py-3 rounded-full text-lg hover:bg-white hover:text-[#2BAE9E] transition duration-300">
-                Become a Caregiver
+                <Link href="/become-caregiver">Become a Caregiver</Link>
               </button>
             </div>
           </div>
@@ -84,9 +85,8 @@ export default function Home() {
               </div>
             </div>
             <div className="md:w-1/2 flex justify-center">
-              <div className="bg-gray-200 border-2 border-dashed rounded-xl w-full h-96 flex items-center justify-center text-gray-500">
-                About Section Image
-              </div>
+               <img className="w-150 border-4 rounded-2xl border-secondary" src="https://i.postimg.cc/vmJRL589/view-hands-with-heart-shape-represent-affection-23-2151728434.jpg" alt="" />
+              
             </div>
           </div>
         </div>
@@ -231,7 +231,8 @@ export default function Home() {
                 "CareLoom helped me find the perfect babysitter for my twins. The screening process gave me complete peace of mind, and our caregiver has been amazing!"
               </p>
               <div className="flex items-center">
-                <div className="bg-gray-200 border-2 border-dashed rounded-xl w-16 h-16 mr-4" />
+                
+                <img className="w-16 rounded-2xl border-2 border-secondary mr-4" src="https://cdn.i-scmp.com/sites/default/files/styles/768x768/public/d8/images/methode/2020/11/27/1b7c54fc-2ed3-11eb-be20-200ca6256645_image_hires_162842.png?itok=hP3jn4is&v=1606465728" alt="" />
                 <div>
                   <h4 className="font-bold text-[#374151]">Sarah Johnson</h4>
                   <p className="text-gray-600">Parent of Twins</p>
@@ -247,7 +248,8 @@ export default function Home() {
                 "Finding reliable elderly care for my mother was challenging until CareLoom. The caregiver is professional, caring, and has become part of our family."
               </p>
               <div className="flex items-center">
-                <div className="bg-gray-200 border-2 border-dashed rounded-xl w-16 h-16 mr-4" />
+                <img className="w-16 rounded-2xl border-2 border-secondary mr-4" src="https://cdn-images.dzcdn.net/images/artist/64bb63409764be705a52e0d55fdbd964/1900x1900-000000-80-0-0.jpg" alt="" />
+                <div></div>
                 <div>
                   <h4 className="font-bold text-[#374151]">Michael Chen</h4>
                   <p className="text-gray-600">Son</p>
@@ -263,7 +265,7 @@ export default function Home() {
                 "After my surgery, I needed someone to help with daily tasks. CareLoom connected me with an incredibly supportive caregiver who made my recovery much easier."
               </p>
               <div className="flex items-center">
-                <div className="bg-gray-200 border-2 border-dashed rounded-xl w-16 h-16 mr-4" />
+                <img className="w-16 rounded-2xl border-2 border-secondary mr-4" src="https://scontent.fdac155-1.fna.fbcdn.net/v/t39.30808-6/293432051_590837302410774_464608527944356831_n.jpg?_nc_cat=108&ccb=1-7&_nc_sid=6ee11a&_nc_eui2=AeH6A4UcY_2YRJwFaxYu35toP5IvvSYBcJM_ki-9JgFwk5vhYGwZxSmZIhb3zc05tDSlhMma8F9N_Q9cTY7pjUHV&_nc_ohc=Wb63iA9WiAEQ7kNvwGrTOv7&_nc_oc=AdnIc5d8jz1AskOPsX_0tMfEVeBUyeEaafvvxrIx1LGlbJuI40i5hn5L9p-qtIqV0jA&_nc_zt=23&_nc_ht=scontent.fdac155-1.fna&_nc_gid=MpOTtUn2ZqyfaJEU6NAdIg&oh=00_Aflwp6HTu3dP_7P-OFezRZtv3GZkPVtFXjVZB380LyqoVg&oe=6951DCC6" alt="" />
                 <div>
                   <h4 className="font-bold text-[#374151]">Robert Williams</h4>
                   <p className="text-gray-600">Patient</p>

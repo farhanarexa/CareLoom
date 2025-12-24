@@ -1,6 +1,7 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from '../components/PrivateRoute';
+import Link from "next/link";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,11 +28,11 @@ function Navbar() {
         </div>
 
         <div className="hidden md:flex space-x-8">
-          <a href="/" className="text-[#374151] hover:text-[#2BAE9E] font-medium">Home</a>
-          <a href="/services" className="text-[#374151] hover:text-[#2BAE9E] font-medium">Services</a>
-          <a href="/how-it-works" className="text-[#374151] hover:text-[#2BAE9E] font-medium">How It Works</a>
-          <a href="/find-caregiver" className="text-[#374151] hover:text-[#2BAE9E] font-medium">Find Caregiver</a>
-          <a href="/become-caregiver" className="text-[#374151] hover:text-[#2BAE9E] font-medium">Become a Caregiver</a>
+          <Link href="/" className="text-[#374151] hover:text-[#2BAE9E] font-medium">Home</Link>
+          <Link href="/services" className="text-[#374151] hover:text-[#2BAE9E] font-medium">Services</Link>
+          <Link href="/how-it-works" className="text-[#374151] hover:text-[#2BAE9E] font-medium">How It Works</Link>
+          <Link href="/find-caregiver" className="text-[#374151] hover:text-[#2BAE9E] font-medium">Find Caregiver</Link>
+          <Link href="/become-caregiver" className="text-[#374151] hover:text-[#2BAE9E] font-medium">Become a Caregiver</Link>
         </div>
 
         <div className="flex items-center space-x-4">
