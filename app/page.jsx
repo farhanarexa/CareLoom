@@ -52,7 +52,7 @@ export default function Home() {
             </div>
           </div>
         </div>
-        <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-white to-transparent"></div>
+        <div className="absolute bottom-0 left-0 right-0 h-16 bg-linear-to-t from-white to-transparent"></div>
       </section>
 
       {/* About Section */}
@@ -228,7 +228,7 @@ export default function Home() {
                 ★★★★★
               </div>
               <p className="text-gray-700 italic mb-6">
-                "CareLoom helped me find the perfect babysitter for my twins. The screening process gave me complete peace of mind, and our caregiver has been amazing!"
+                &quot;CareLoom helped me find the perfect babysitter for my twins. The screening process gave me complete peace of mind, and our caregiver has been amazing!&quot;
               </p>
               <div className="flex items-center">
                 
@@ -245,7 +245,7 @@ export default function Home() {
                 ★★★★★
               </div>
               <p className="text-gray-700 italic mb-6">
-                "Finding reliable elderly care for my mother was challenging until CareLoom. The caregiver is professional, caring, and has become part of our family."
+                &quot;Finding reliable elderly care for my mother was challenging until CareLoom. The caregiver is professional, caring, and has become part of our family.&quot;
               </p>
               <div className="flex items-center">
                 <img className="w-16 rounded-2xl border-2 border-secondary mr-4" src="https://cdn-images.dzcdn.net/images/artist/64bb63409764be705a52e0d55fdbd964/1900x1900-000000-80-0-0.jpg" alt="" />
@@ -262,7 +262,7 @@ export default function Home() {
                 ★★★★★
               </div>
               <p className="text-gray-700 italic mb-6">
-                "After my surgery, I needed someone to help with daily tasks. CareLoom connected me with an incredibly supportive caregiver who made my recovery much easier."
+                &quot;After my surgery, I needed someone to help with daily tasks. CareLoom connected me with an incredibly supportive caregiver who made my recovery much easier.&quot;
               </p>
               <div className="flex items-center">
                 <img className="w-16 rounded-2xl border-2 border-secondary mr-4" src="https://scontent.fdac155-1.fna.fbcdn.net/v/t39.30808-6/293432051_590837302410774_464608527944356831_n.jpg?_nc_cat=108&ccb=1-7&_nc_sid=6ee11a&_nc_eui2=AeH6A4UcY_2YRJwFaxYu35toP5IvvSYBcJM_ki-9JgFwk5vhYGwZxSmZIhb3zc05tDSlhMma8F9N_Q9cTY7pjUHV&_nc_ohc=Wb63iA9WiAEQ7kNvwGrTOv7&_nc_oc=AdnIc5d8jz1AskOPsX_0tMfEVeBUyeEaafvvxrIx1LGlbJuI40i5hn5L9p-qtIqV0jA&_nc_zt=23&_nc_ht=scontent.fdac155-1.fna&_nc_gid=MpOTtUn2ZqyfaJEU6NAdIg&oh=00_Aflwp6HTu3dP_7P-OFezRZtv3GZkPVtFXjVZB380LyqoVg&oe=6951DCC6" alt="" />
