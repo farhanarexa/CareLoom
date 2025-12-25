@@ -189,7 +189,7 @@ export default function FindCaregiverPage() {
         <div className="text-center mb-12 py-8">
           <h1 className="text-4xl md:text-5xl font-bold text-[#374151] mb-6">Find Your Perfect Caregiver</h1>
           <p className="text-xl text-gray-700 max-w-3xl mx-auto">
-            Discover trusted, verified caregivers who match your family's unique needs and preferences
+            Discover trusted, verified caregivers who match your family&apos;s unique needs and preferences
           </p>
         </div>
 
@@ -319,12 +319,18 @@ export default function FindCaregiverPage() {
                 </div>
                 <div className="bg-[#F7EFE5] px-6 py-4">
                   <div className="flex justify-between">
-                    <button className="text-[#2BAE9E] font-medium hover:text-[#5a9e7f]">
+                    <a
+                      href={`/caregiver/${caregiver.id}`}
+                      className="text-[#2BAE9E] font-medium hover:text-[#5a9e7f]"
+                    >
                       View Profile
-                    </button>
-                    <button className="bg-[#2BAE9E] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#5a9e7f] transition duration-300">
+                    </a>
+                    <a
+                      href={`/caregiver/${caregiver.id}`}
+                      className="bg-[#2BAE9E] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#5a9e7f] transition duration-300"
+                    >
                       Contact
-                    </button>
+                    </a>
                   </div>
                 </div>
               </div>

@@ -52,11 +52,112 @@ const services = [
   }
 ];
 
+// Mock data for caregivers
+const caregivers = [
+  {
+    id: 1,
+    name: "Sarah Johnson",
+    rating: 4.9,
+    reviews: 128,
+    hourlyRate: 25,
+    experience: "5 years",
+    skills: ["Childcare", "First Aid", "Tutoring"],
+    image: "/placeholder-caregiver.jpg",
+    location: "Dhaka, Bangladesh",
+    bio: "Passionate caregiver with extensive experience in child development and early education.",
+    availability: "Available this week",
+    services: ["Baby Care"]
+  },
+  {
+    id: 2,
+    name: "Michael Chen",
+    rating: 4.8,
+    reviews: 96,
+    hourlyRate: 28,
+    experience: "8 years",
+    skills: ["Elderly Care", "Medication Management", "Mobility Assistance"],
+    image: "/placeholder-caregiver.jpg",
+    location: "Dhaka, Bangladesh",
+    bio: "Compassionate elderly care specialist with nursing background and extensive experience.",
+    availability: "Available next week",
+    services: ["Elderly Care"]
+  },
+  {
+    id: 3,
+    name: "Fatima Rahman",
+    rating: 4.95,
+    reviews: 210,
+    hourlyRate: 22,
+    experience: "6 years",
+    skills: ["Baby Care", "Newborn Care", "Household Management"],
+    image: "/placeholder-caregiver.jpg",
+    location: "Dhaka, Bangladesh",
+    bio: "Experienced nanny with expertise in infant care and early childhood development.",
+    availability: "Available today",
+    services: ["Baby Care"]
+  },
+  {
+    id: 4,
+    name: "David Wilson",
+    rating: 4.7,
+    reviews: 75,
+    hourlyRate: 30,
+    experience: "10 years",
+    skills: ["Special Needs", "Physical Therapy", "Respite Care"],
+    image: "/placeholder-caregiver.jpg",
+    location: "Dhaka, Bangladesh",
+    bio: "Specialized in caring for individuals with special needs and chronic conditions.",
+    availability: "Available this week",
+    services: ["Special Needs"]
+  },
+  {
+    id: 5,
+    name: "Ayesha Khan",
+    rating: 4.85,
+    reviews: 142,
+    hourlyRate: 24,
+    experience: "4 years",
+    skills: ["Sick Care", "Companionship", "Meal Preparation"],
+    image: "/placeholder-caregiver.jpg",
+    location: "Dhaka, Bangladesh",
+    bio: "Dedicated caregiver with medical training and experience in post-surgery care.",
+    availability: "Available tomorrow",
+    services: ["Sick Care"]
+  },
+  {
+    id: 6,
+    name: "Robert Brown",
+    rating: 4.9,
+    reviews: 189,
+    hourlyRate: 26,
+    experience: "7 years",
+    skills: ["Pet Care", "Household Management", "Light Cleaning"],
+    image: "/placeholder-caregiver.jpg",
+    location: "Dhaka, Bangladesh",
+    bio: "Multi-skilled caregiver who provides comprehensive household support and pet care.",
+    availability: "Available this week",
+    services: ["Pet Care"]
+  }
+];
+
 function BookingPageContent({ params }) {
-  const service = services.find(s => s.id === params.serviceId);
+  const { caregiverId, serviceId } = params;
   const { data: session, status } = useSession();
 
-  if (!service) {
+  // Find the specific caregiver
+  const caregiver = caregivers.find(c => c.id === parseInt(caregiverId));
+  const service = services.find(s => s.id === serviceId);
+
+  // If no caregiver is found, use the service data for the title and rate
+  const bookingService = service || {
+    id: serviceId,
+    title: serviceId ? serviceId.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase()) : 'Service',
+    hourlyRate: caregiver ? caregiver.hourlyRate : 25,
+    category: 'General Care',
+    image: '/placeholder-service.jpg'
+  };
+
+  if (!service && !caregiver) {
     notFound();
   }
 
@@ -76,14 +177,14 @@ function BookingPageContent({ params }) {
   useEffect(() => {
     let cost = 0;
     if (duration.unit === 'hours') {
-      cost = service.hourlyRate * duration.value;
+      cost = bookingService.hourlyRate * duration.value;
     } else if (duration.unit === 'days') {
-      cost = service.hourlyRate * duration.value * 8; // Assuming 8 hours per day
+      cost = bookingService.hourlyRate * duration.value * 8; // Assuming 8 hours per day
     } else if (duration.unit === 'weeks') {
-      cost = service.hourlyRate * duration.value * 8 * 5; // Assuming 5 days per week
+      cost = bookingService.hourlyRate * duration.value * 8 * 5; // Assuming 5 days per week
     }
     setTotalCost(cost);
-  }, [duration, service.hourlyRate]);
+  }, [duration, bookingService.hourlyRate]);
 
   const handleDurationChange = (e) => {
     const [value, unit] = e.target.value.split('-');
@@ -100,15 +201,15 @@ function BookingPageContent({ params }) {
 
     // Create booking object
     const bookingDetails = {
-      service: service.title,
+      service: bookingService.title,
       duration: `${duration.value} ${duration.unit}`,
       location: `${location.city}, ${location.area}`,
       totalCost: totalCost,
       date: new Date().toISOString().split('T')[0],
       status: 'Pending',
-      serviceId: service.id,
-      caregiver: 'Any Available Caregiver', // Default for service-based booking
-      caregiverId: null
+      serviceId: bookingService.id,
+      caregiver: caregiver ? caregiver.name : 'Any Available Caregiver',
+      caregiverId: caregiver ? caregiver.id : null
     };
 
     // Get user from NextAuth session
@@ -152,8 +253,12 @@ function BookingPageContent({ params }) {
             <span className="mx-2">/</span>
             <a href="/services" className="hover:text-[#2BAE9E]">Services</a>
             <span className="mx-2">/</span>
-            <a href={`/services/${service.id}`} className="hover:text-[#2BAE9E]">{service.title}</a>
-            <span className="mx-2">/</span>
+            {caregiver ? (
+              <>
+                <a href={`/caregiver/${caregiver.id}`} className="hover:text-[#2BAE9E]">{caregiver.name}</a>
+                <span className="mx-2">/</span>
+              </>
+            ) : null}
             <span className="text-gray-700">Booking</span>
           </nav>
         </div>
@@ -162,7 +267,26 @@ function BookingPageContent({ params }) {
           {/* Booking Form */}
           <div className="md:col-span-2">
             <div className="bg-white rounded-2xl shadow-lg p-8">
-              <h1 className="text-3xl font-bold text-[#374151] mb-8">Book {service.title}</h1>
+              <h1 className="text-3xl font-bold text-[#374151] mb-8">
+                Book {bookingService.title} {caregiver ? `with ${caregiver.name}` : ''}
+              </h1>
+
+              {caregiver && (
+                <div className="mb-6 p-4 bg-[#F7EFE5] rounded-lg">
+                  <div className="flex items-center">
+                    <div className="bg-gray-200 border-2 border-dashed rounded-xl w-12 h-12 mr-4" />
+                    <div>
+                      <h3 className="font-bold text-[#374151]">{caregiver.name}</h3>
+                      <div className="flex items-center">
+                        <svg className="w-4 h-4 text-yellow-400 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                        </svg>
+                        <span className="text-sm font-medium">{caregiver.rating} ({caregiver.reviews} reviews)</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               <form onSubmit={handleSubmit}>
                 {/* Duration Selection */}
@@ -192,7 +316,7 @@ function BookingPageContent({ params }) {
                       </select>
                     </div>
                     <div className="flex items-end">
-                      <div className="text-lg font-bold text-[#2BAE9E]">${service.hourlyRate}/hr</div>
+                      <div className="text-lg font-bold text-[#2BAE9E]">${bookingService.hourlyRate}/hr</div>
                     </div>
                   </div>
                 </div>
@@ -272,8 +396,9 @@ function BookingPageContent({ params }) {
                   <h2 className="text-xl font-bold text-[#374151] mb-4">Booking Summary</h2>
                   <div className="flex justify-between items-center mb-4">
                     <div>
-                      <h3 className="font-bold text-[#374151]">{service.title}</h3>
-                      <p className="text-gray-600 text-sm">{duration.value} {duration.unit} at ${service.hourlyRate}/hr</p>
+                      <h3 className="font-bold text-[#374151]">{bookingService.title}</h3>
+                      {caregiver && <p className="text-gray-600 text-sm">With {caregiver.name}</p>}
+                      <p className="text-gray-600 text-sm">{duration.value} {duration.unit} at ${bookingService.hourlyRate}/hr</p>
                     </div>
                     <div className="text-right">
                       <p className="text-gray-600">Total Cost</p>
@@ -303,13 +428,23 @@ function BookingPageContent({ params }) {
             <div className="bg-white rounded-2xl shadow-lg p-6 sticky top-6">
               <h2 className="text-xl font-bold text-[#374151] mb-6">Booking Details</h2>
 
-              <div className="flex items-center mb-6">
-                <div className="bg-gray-200 border-2 border-dashed rounded-xl w-16 h-16 mr-4" />
-                <div>
-                  <h3 className="font-bold text-[#374151]">{service.title}</h3>
-                  <p className="text-gray-600 text-sm">{service.category}</p>
+              {caregiver ? (
+                <div className="flex items-center mb-6">
+                  <div className="bg-gray-200 border-2 border-dashed rounded-xl w-16 h-16 mr-4" />
+                  <div>
+                    <h3 className="font-bold text-[#374151]">{caregiver.name}</h3>
+                    <p className="text-gray-600 text-sm">{bookingService.title}</p>
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <div className="flex items-center mb-6">
+                  <div className="bg-gray-200 border-2 border-dashed rounded-xl w-16 h-16 mr-4" />
+                  <div>
+                    <h3 className="font-bold text-[#374151]">{bookingService.title}</h3>
+                    <p className="text-gray-600 text-sm">{bookingService.category}</p>
+                  </div>
+                </div>
+              )}
 
               <div className="space-y-4 mb-6">
                 <div className="flex justify-between">
@@ -318,7 +453,7 @@ function BookingPageContent({ params }) {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Hourly Rate:</span>
-                  <span className="font-medium">${service.hourlyRate}/hr</span>
+                  <span className="font-medium">${bookingService.hourlyRate}/hr</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Location:</span>
