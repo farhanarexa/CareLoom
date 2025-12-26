@@ -1,10 +1,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { PrivateRoute } from '../../../components/PrivateRoute';
 import { sendBookingConfirmationEmail, generateBookingInvoiceTemplate } from '../../../lib/emailService';
 import { useSession } from 'next-auth/react';
+import { createBooking } from '../../../lib/bookingService';
+import { processPayment } from '../../../lib/paymentService';
 
 // Mock data for services
 const services = [
@@ -172,6 +174,7 @@ function BookingPageContent({ params }) {
   });
   const [totalCost, setTotalCost] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [paymentStatus, setPaymentStatus] = useState('not-started'); // not-started, processing, success, failed
 
   // Calculate total cost when duration changes
   useEffect(() => {
@@ -198,39 +201,68 @@ function BookingPageContent({ params }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setPaymentStatus('processing');
 
-    // Create booking object
-    const bookingDetails = {
+    // Process payment first
+    const paymentResult = await processPayment(totalCost, 'usd', `CareLoom Service Payment for ${bookingService.title}`);
+
+    if (!paymentResult.success) {
+      setPaymentStatus('failed');
+      alert(`Payment processing failed: ${paymentResult.error || 'Please try again.'}`);
+      setIsSubmitting(false);
+      return;
+    }
+
+    // Create booking object with payment information
+    const bookingData = {
+      serviceId: bookingService.id,
       service: bookingService.title,
       duration: `${duration.value} ${duration.unit}`,
       location: `${location.city}, ${location.area}`,
       totalCost: totalCost,
       date: new Date().toISOString().split('T')[0],
-      status: 'Pending',
-      serviceId: bookingService.id,
+      status: 'Confirmed', // Set to confirmed since payment was successful
       caregiver: caregiver ? caregiver.name : 'Any Available Caregiver',
-      caregiverId: caregiver ? caregiver.id : null
+      caregiverId: caregiver ? caregiver.id : null,
+      userId: session?.user?.id || null,
+      payment: {
+        paymentIntentId: paymentResult.paymentIntentId,
+        clientSecret: paymentResult.clientSecret,
+        amount: totalCost,
+        currency: 'usd',
+        status: 'succeeded', // Assuming payment succeeded if we reach this point
+        createdAt: new Date().toISOString()
+      }
     };
 
     // Get user from NextAuth session
     const user = session?.user || { name: 'John Doe', email: 'john@example.com' };
 
     try {
-      // Simulate booking submission
-      // In a real app, this would make an API call to save the booking
-      setTimeout(async () => {
-        // Send confirmation email
-        await sendBookingConfirmationEmail(bookingDetails, user);
+      // Create booking in the system
+      const result = await createBooking(bookingData);
 
-        alert('Booking submitted successfully! Status: Pending. A confirmation email has been sent to your email address.');
-        setIsSubmitting(false);
+      if (result.success) {
+        // Send invoice email
+        await sendBookingConfirmationEmail(bookingData, user);
 
-        // Here you would typically redirect to the my-bookings page
-        // router.push('/my-bookings');
-      }, 1500);
+        setPaymentStatus('success');
+        alert('Booking confirmed successfully! Payment processed. An invoice email has been sent to your email address.');
+
+        // Redirect to my-bookings page after a short delay
+        setTimeout(() => {
+          if (typeof window !== 'undefined') {
+            window.location.href = '/my-bookings';
+          }
+        }, 1500);
+      } else {
+        throw new Error(result.error || 'Failed to create booking');
+      }
     } catch (error) {
-      console.error('Error submitting booking:', error);
-      alert('There was an error submitting your booking. Please try again.');
+      console.error('Error processing booking and payment:', error);
+      setPaymentStatus('failed');
+      alert(`There was an error processing your booking and payment: ${error.message || 'Please try again.'}`);
+    } finally {
       setIsSubmitting(false);
     }
   };
@@ -405,6 +437,33 @@ function BookingPageContent({ params }) {
                       <p className="text-2xl font-bold text-[#2BAE9E]">${totalCost.toFixed(2)}</p>
                     </div>
                   </div>
+
+                  {paymentStatus === 'processing' && (
+                    <div className="mt-4 p-3 bg-yellow-100 text-yellow-800 rounded-lg flex items-center">
+                      <svg className="w-5 h-5 mr-2 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                      </svg>
+                      Processing payment...
+                    </div>
+                  )}
+
+                  {paymentStatus === 'success' && (
+                    <div className="mt-4 p-3 bg-green-100 text-green-800 rounded-lg flex items-center">
+                      <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                      </svg>
+                      Payment successful!
+                    </div>
+                  )}
+
+                  {paymentStatus === 'failed' && (
+                    <div className="mt-4 p-3 bg-red-100 text-red-800 rounded-lg flex items-center">
+                      <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
+                      </svg>
+                      Payment failed. Please try again.
+                    </div>
+                  )}
                 </div>
 
                 {/* Submit Button */}
@@ -417,7 +476,7 @@ function BookingPageContent({ params }) {
                       : 'bg-[#2BAE9E] text-white hover:bg-[#5a9e7f]'
                   } transition duration-300`}
                 >
-                  {isSubmitting ? 'Processing...' : 'Confirm Booking'}
+                  {isSubmitting ? 'Processing Payment...' : 'Confirm Booking & Pay'}
                 </button>
               </form>
             </div>

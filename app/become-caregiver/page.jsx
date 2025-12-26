@@ -53,9 +53,7 @@ export default function BecomeCaregiverPage() {
                 <span className="text-lg text-gray-700"><span className="font-semibold">Support System</span> - Access to resources and support when you need it</span>
               </li>
             </ul>
-            <button className="bg-[#2BAE9E] text-white px-8 py-4 rounded-full text-lg font-medium hover:bg-[#5a9e7f] transition duration-300">
-              Apply Now
-            </button>
+            
           </div>
         </div>
 

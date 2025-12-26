@@ -190,7 +190,15 @@ function MyBookingsPage() {
                       </button>
                     )}
 
-                    <button className="px-4 py-2 border border-[#2BAE9E] text-[#2BAE9E] rounded-lg hover:bg-[#F7EFE5] transition duration-300">
+                    <button
+                      onClick={() => {
+                        // Navigate to the booking details page
+                        if (typeof window !== 'undefined') {
+                          window.location.href = `/my-bookings/${booking.id}`;
+                        }
+                      }}
+                      className="px-4 py-2 border border-[#2BAE9E] text-[#2BAE9E] rounded-lg hover:bg-[#F7EFE5] transition duration-300"
+                    >
                       View Details
                     </button>
                   </div>
